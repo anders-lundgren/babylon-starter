@@ -8,9 +8,9 @@ canvas.id = "gameCanvas";
 document.body.appendChild(canvas);
 
 // Load the 3D engine
-var engine = new BABYLON.Engine(canvas, true, {preserveDrawingBuffer: true, stencil: true});
+var engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
 // CreateScene function that creates and return the scene
-var createScene = function(){
+var createScene = function () {
     // Create a basic BJS Scene object
     var scene = new BABYLON.Scene(engine);
     // Create a FreeCamera, and set its position to {x: 0, y: 5, z: -10}
@@ -27,20 +27,36 @@ var createScene = function(){
     sphere.position.y = 1;
     var mat = new BABYLON.StandardMaterial("mat", scene);
     mat.diffuseColor = new BABYLON.Color3(0, 1, 0);
-    sphere.material =  mat;
+    sphere.material = mat;
 
-    // Create a built-in "ground" shape; its constructor takes 6 params : name, width, height, subdivision, scene, updatable
-    var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, scene, false);
     // Return the created scene
     return scene;
 }
 // call the createScene function
 var scene = createScene();
+
+// Create a built-in "ground" shape; its constructor takes 6 params : name, width, height, subdivision, scene, updatable
+var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, scene, false);
+// Create a default environment for the scene.
+const env = scene.createDefaultEnvironment({
+});
+
+// here we add XR support
+if (env != null) {
+    const xrHelper = scene.createDefaultXRExperienceAsync({
+        floorMeshes: [<BABYLON.AbstractMesh>env.ground],
+        disableDefaultUI: false
+    })
+}
+else {
+    console.log('WebXR environment is unavailable');
+}
+
 // run the render loop
-engine.runRenderLoop(function(){
+engine.runRenderLoop(function () {
     scene.render();
 });
-// the canvas/window resize event handler
-window.addEventListener('resize', function(){
+// add the canvas/window resize event handler
+window.addEventListener('resize', function () {
     engine.resize();
 });
